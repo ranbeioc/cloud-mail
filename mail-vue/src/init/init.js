@@ -16,10 +16,14 @@ export async function init() {
     const accountStore = useAccountStore();
 
     const token = localStorage.getItem('token');
+
     if (!settingStore.lang) {
-        let lang = navigator.language.split('-')[0]
-        lang = lang === 'zh' ? lang : 'en'
-        settingStore.lang = lang
+        let lang = navigator.language
+        if (lang.split('-')[0] === 'zh') {
+            settingStore.lang = lang === 'zh-CN' ? 'zh' : 'zhTW'
+        } else {
+            settingStore.lang = lang
+        }
     }
 
     i18n.global.locale.value = settingStore.lang
@@ -55,24 +59,17 @@ export async function init() {
         document.title = setting.title;
     }
 
-    const loading = document.getElementById('loading-first');
+    removeLoading();
+}
 
-    if (!setting.background) {
-        loading.remove();
-        return;
+function removeLoading() {
+    if (window.innerWidth < 1025) {
+        document.documentElement.style.setProperty('--loading-hide-transition', 'none')
     }
-
-    const img = new Image();
-    img.src = cvtR2Url(setting.background);
-    img.onload = () => {
-        loading.remove();
-    };
-
-    img.onerror = () => {
-
-        console.warn('背景图片加载失败:', img.src);
-        loading.remove();
-
-    };
+    const doc = document.getElementById('loading-first');
+    doc.classList.add('loading-hide')
+    setTimeout(() => {
+        doc.remove()
+    },1000)
 }
 
